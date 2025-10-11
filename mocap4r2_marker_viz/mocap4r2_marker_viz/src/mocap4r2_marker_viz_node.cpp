@@ -81,7 +81,11 @@ const
   } else if (mocap4r2_system_ == "qualisys") {
     // TO-DO:
     rviz_pose = mocap4r2_pose;
-  } else {
+  } else if (mocap4r2_system_ == "nokov"){
+    // TO-DO:
+    rviz_pose = mocap4r2_pose;
+  }
+  else {
     rviz_pose = mocap4r2_pose;
   }
   return rviz_pose;

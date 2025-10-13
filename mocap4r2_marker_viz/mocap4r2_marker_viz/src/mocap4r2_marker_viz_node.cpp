@@ -81,7 +81,8 @@ const
   } else if (mocap4r2_system_ == "qualisys") {
     // TO-DO:
     rviz_pose = mocap4r2_pose;
-  } else if (mocap4r2_system_ == "nokov"){
+  }
+  else if (mocap4r2_system_ == "nokov"){
     // TO-DO:
     rviz_pose = mocap4r2_pose;
   }
@@ -152,6 +153,7 @@ MarkerVisualizer::rb_callback(const mocap4r2_msgs::msg::RigidBodies::SharedPtr m
         marker2visual(
           counter_markers_rb++,
           marker.translation, msg->header));
+         visual_markers_rb.markers.push_back(rb_name2visual(counter_rb, rb.pose, rb.rigid_body_name, msg->header));
     }
   }
 
@@ -182,4 +184,37 @@ MarkerVisualizer::rb2visual(
   viz_marker.scale = marker_scale_;
   viz_marker.lifetime = rclcpp::Duration::from_seconds(marker_lifetime_);
   return viz_marker;
+}
+
+// 添加文本标记显示刚体名称
+visualization_msgs::msg::Marker
+MarkerVisualizer::rb_name2visual(
+  int index, const geometry_msgs::msg::Pose & poserb, const std::string & rigid_body_name,
+  const std_msgs::msg::Header & header) const
+{
+  visualization_msgs::msg::Marker text_marker;
+  text_marker.header = header;
+  text_marker.ns = namespace_ + "_names";
+  text_marker.color.r = 1.0f;  // 红色文字
+  text_marker.color.g = 1.0f;
+  text_marker.color.b = 1.0f;
+  text_marker.color.a = 1.0f;
+  text_marker.id = index + 1000;  // 用大数字避免与箭头ID冲突
+  text_marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+  text_marker.action = visualization_msgs::msg::Marker::ADD;
+
+  geometry_msgs::msg::Pose text_pose = mocap2rviz(poserb);
+  text_pose.position.z += 0.1f;
+  text_marker.pose = text_pose;
+
+  text_marker.text = rigid_body_name.empty() ? "RB_" + std::to_string(index) : rigid_body_name;
+  
+  geometry_msgs::msg::Vector3 text_scale;
+  text_scale.x = 0.1f;
+  text_scale.y = 0.1f;
+  text_scale.z = 0.1f;
+  text_marker.scale = text_scale;
+  text_marker.lifetime = rclcpp::Duration::from_seconds(marker_lifetime_);
+
+  return text_marker;
 }

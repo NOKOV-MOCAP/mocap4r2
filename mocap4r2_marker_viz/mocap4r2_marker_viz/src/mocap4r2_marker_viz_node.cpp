@@ -147,13 +147,15 @@ MarkerVisualizer::rb_callback(const mocap4r2_msgs::msg::RigidBodies::SharedPtr m
 
   for (const mocap4r2_msgs::msg::RigidBody & rb : msg->rigidbodies) {
     visual_markers_rb.markers.push_back(rb2visual(counter_rb++, rb.pose, msg->header));
-
+    visual_markers_rb.markers.push_back(
+      rb_name2visual(
+        counter_rb, rb.pose, 
+        rb.rigid_body_name, msg->header));
     for (const mocap4r2_msgs::msg::Marker & marker : rb.markers) {
       visual_markers_rb.markers.push_back(
         marker2visual(
           counter_markers_rb++,
           marker.translation, msg->header));
-         visual_markers_rb.markers.push_back(rb_name2visual(counter_rb, rb.pose, rb.rigid_body_name, msg->header));
     }
   }
 
@@ -186,7 +188,6 @@ MarkerVisualizer::rb2visual(
   return viz_marker;
 }
 
-// 添加文本标记显示刚体名称
 visualization_msgs::msg::Marker
 MarkerVisualizer::rb_name2visual(
   int index, const geometry_msgs::msg::Pose & poserb, const std::string & rigid_body_name,
@@ -195,11 +196,11 @@ MarkerVisualizer::rb_name2visual(
   visualization_msgs::msg::Marker text_marker;
   text_marker.header = header;
   text_marker.ns = namespace_ + "_names";
-  text_marker.color.r = 1.0f;  // 红色文字
+  text_marker.color.r = 1.0f;
   text_marker.color.g = 1.0f;
   text_marker.color.b = 1.0f;
   text_marker.color.a = 1.0f;
-  text_marker.id = index + 1000;  // 用大数字避免与箭头ID冲突
+  text_marker.id = index + 1000; 
   text_marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
   text_marker.action = visualization_msgs::msg::Marker::ADD;
 
